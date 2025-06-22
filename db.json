@@ -1,19 +1,42 @@
-{
-  "movies": [
-    {
-      "id": 1,
-      "title": "The Brave Little Toaster",
-      "summary": "A group of appliances set off on a journey"
-    },
-    {
-      "id": 2,
-      "title": "The Princess Bride",
-      "summary": "A mix of swashbuckling, romance, and comedy"
-    },
-    {
-      "id": 3,
-      "title": "Spirited Away",
-      "summary": "A young girl works to reunite with her parents while trapped in a supernatural realm"
+const init = () => {
+  const inputForm = document.querySelector("form");
+
+  inputForm.addEventListener("submit", (event) => {
+    event.preventDefault(); // Prevent form from refreshing
+    const input = document.querySelector("input#searchByID");
+
+    const movieId = input.value.trim(); // Trim to remove spaces
+
+    if (!movieId) {
+      alert("Please enter a movie ID.");
+      return;
     }
-  ]
-}
+
+    fetch(`http://localhost:3000/movies/${movieId}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Movie not found");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        const title = document.querySelector("section#movieDetails h4");
+        const summary = document.querySelector("section#movieDetails p");
+
+        title.innerText = data.title;
+        summary.innerText = data.summary;
+      })
+      .catch((error) => {
+        const title = document.querySelector("section#movieDetails h4");
+        const summary = document.querySelector("section#movieDetails p");
+
+        title.innerText = "Movie Not Found";
+        summary.innerText = "Please enter a valid ID (1, 2, or 3).";
+        console.error("Error:", error.message);
+      });
+
+    input.value = ""; // Optional: clear the input field after search
+  });
+};
+
+document.addEventListener("DOMContentLoaded", init);
